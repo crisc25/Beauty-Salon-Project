@@ -6,9 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Cecan Cristina",
   "license": "ISC",
-  "description": "",
+  "description": "web site for beauty-salon",
   "dependencies": {
     "express": "^5.2.1"
   }
