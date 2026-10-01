@@ -63,6 +63,53 @@ const update = async (id, service) => {
     return result.rows[0];
 };
 
+
+const patch = async (id, service) => {
+    const fields = [];
+    const values = [];
+
+    if (service.id_categorie !== undefined) {
+        fields.push(`id_categorie = $${values.length + 1}`);
+        values.push(service.id_categorie);
+    }
+
+    if (service.denumire !== undefined) {
+        fields.push(`denumire = $${values.length + 1}`);
+        values.push(service.denumire);
+    }
+
+    if (service.durata_minute !== undefined) {
+        fields.push(`durata_minute = $${values.length + 1}`);
+        values.push(service.durata_minute);
+    }
+
+    if (service.pret !== undefined) {
+        fields.push(`pret = $${values.length + 1}`);
+        values.push(service.pret);
+    }
+
+    if (service.is_active !== undefined) {
+        fields.push(`is_active = $${values.length + 1}`);
+        values.push(service.is_active);
+    }
+
+    if (service.descriere !== undefined) {
+        fields.push(`descriere = $${values.length + 1}`);
+        values.push(service.descriere);
+    }
+
+    values.push(id);
+
+    const result = await pool.query(
+        `UPDATE servicii
+         SET ${fields.join(", ")}
+         WHERE id_serviciu = $${values.length}
+         RETURNING *`,
+        values
+    );
+
+    return result.rows[0];
+};
 const deleteById = async (id) => {
     const result = await pool.query(
         "DELETE FROM servicii WHERE id_serviciu = $1 RETURNING *",
@@ -77,5 +124,6 @@ module.exports = {
     getById,
     create,
     update,
+    patch,
     deleteById
 };

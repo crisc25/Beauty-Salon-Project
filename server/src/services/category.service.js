@@ -18,6 +18,9 @@ const updateCategory = async (id, category) => {
     return await categoryModel.update(id, category);
 };
 
+const patchCategory = async (id, category) => {
+    return await categoryModel.patch(id, category);
+};
 const deleteCategory = async (id) => {
     return await categoryModel.deleteById(id);
 };
@@ -27,5 +30,6 @@ module.exports = {
      getCategoryById,
      createCategory,
      updateCategory,
+     patchCategory,
      deleteCategory
 };

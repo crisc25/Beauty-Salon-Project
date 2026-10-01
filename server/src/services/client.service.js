@@ -18,6 +18,10 @@ const updateClient = async (id, client) => {
     return await clientModel.update(id, client);
 };
 
+const patchClient = async (id, client) => {
+    return await clientModel.patch(id, client);
+};
+
 const deleteClient = async (id) => {
     return await clientModel.deleteById(id);
 };
@@ -27,5 +31,6 @@ module.exports = {
     getClientById,
     createClient,
     updateClient,
+    patchClient,
     deleteClient
 };

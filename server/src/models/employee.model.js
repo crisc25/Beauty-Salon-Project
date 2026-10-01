@@ -67,6 +67,63 @@ const update = async (id, employee) => {
     return result.rows[0];
 };
 
+const patch = async (id, employee) => {
+    const fields = [];
+    const values = [];
+
+    if (employee.nume !== undefined) {
+        fields.push(`nume = $${values.length + 1}`);
+        values.push(employee.nume);
+    }
+
+    if (employee.prenume !== undefined) {
+        fields.push(`prenume = $${values.length + 1}`);
+        values.push(employee.prenume);
+    }
+
+    if (employee.telefon !== undefined) {
+        fields.push(`telefon = $${values.length + 1}`);
+        values.push(employee.telefon);
+    }
+
+    if (employee.specializare !== undefined) {
+        fields.push(`specializare = $${values.length + 1}`);
+        values.push(employee.specializare);
+    }
+
+    if (employee.email !== undefined) {
+        fields.push(`email = $${values.length + 1}`);
+        values.push(employee.email);
+    }
+
+    if (employee.parola !== undefined) {
+        fields.push(`parola = $${values.length + 1}`);
+        values.push(employee.parola);
+    }
+
+    if (employee.rol !== undefined) {
+        fields.push(`rol = $${values.length + 1}`);
+        values.push(employee.rol);
+    }
+
+    if (employee.data_angajarii !== undefined) {
+        fields.push(`data_angajarii = $${values.length + 1}`);
+        values.push(employee.data_angajarii);
+    }
+
+    values.push(id);
+
+    const result = await pool.query(
+        `UPDATE angajati
+         SET ${fields.join(", ")}
+         WHERE id_angajat = $${values.length}
+         RETURNING *`,
+        values
+    );
+
+    return result.rows[0];
+};
+
 const deleteById = async (id) => {
     const result = await pool.query(
         "DELETE FROM angajati WHERE id_angajat = $1 RETURNING *",
@@ -80,5 +137,6 @@ module.exports = {
     getById,
     create,
     update,
+    patch,
     deleteById
 };

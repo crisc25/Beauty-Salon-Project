@@ -26,6 +26,14 @@ const updateClient = async (req, res) => {
 
     res.json(client);
 };
+const patchClient = async (req, res) => {
+    const client = await clientService.patchClient(
+        req.params.id,
+        req.body
+    );
+
+    res.json(client);
+};
 
 const deleteClient = async (req, res) => {
     const client = await clientService.deleteClient(req.params.id);
@@ -38,5 +46,6 @@ module.exports = {
     getClientById,
     createClient,
     updateClient,
+    patchClient,
     deleteClient
 };

@@ -29,6 +29,15 @@ const updateAppointment = async (req, res) => {
     res.json(appointment);
 };
 
+const patchAppointment = async (req, res) => {
+    const appointment = await appointmentService.patchAppointment(
+        req.params.id,
+        req.body
+    );
+
+    res.json(appointment);
+};
+
 const deleteAppointment = async (req, res) => {
     const appointment = await appointmentService.deleteAppointment(
         req.params.id
@@ -42,5 +51,6 @@ module.exports = {
     getAppointmentById,
     createAppointment,
     updateAppointment,
+    patchAppointment,
     deleteAppointment
 };

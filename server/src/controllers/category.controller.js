@@ -27,6 +27,15 @@ const updateCategory = async (req, res) => {
     res.json(category);
 };
 
+const patchCategory = async (req, res) => {
+    const category = await categoryService.patchCategory(
+        req.params.id,
+        req.body
+    );
+
+    res.json(category);
+};
+
 const deleteCategory = async (req, res) => {
     const category = await categoryService.deleteCategory(req.params.id);
 
@@ -38,5 +47,6 @@ module.exports = {
     getCategoryById,
     createCategory,
     updateCategory,
+    patchCategory,
      deleteCategory
 };

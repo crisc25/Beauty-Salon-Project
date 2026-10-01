@@ -14,6 +14,9 @@ const createEmployee = async (employee) => {
 const updateEmployee = async (id, employee) => {
     return await employeeModel.update(id, employee);
 };
+const patchEmployee = async (id, employee) => {
+    return await employeeModel.patch(id, employee);
+};
 
 const deleteEmployee = async (id) => {
     return await employeeModel.deleteById(id);
@@ -24,5 +27,6 @@ module.exports = {
     getEmployeeById,
     createEmployee,
     updateEmployee,
+    patchEmployee,
     deleteEmployee
 };

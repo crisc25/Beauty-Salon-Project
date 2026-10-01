@@ -49,6 +49,34 @@ const update = async (id, category) => {
 
     return result.rows[0];
 };
+
+const patch = async (id, category) => {
+    const fields = [];
+    const values = [];
+
+    if (category.nume_categorie !== undefined) {
+        fields.push(`nume_categorie = $${values.length + 1}`);
+        values.push(category.nume_categorie);
+    }
+
+    if (category.descriere !== undefined) {
+        fields.push(`descriere = $${values.length + 1}`);
+        values.push(category.descriere);
+    }
+
+    values.push(id);
+
+    const result = await pool.query(
+        `UPDATE categorii
+         SET ${fields.join(", ")}
+         WHERE id_categorie = $${values.length}
+         RETURNING *`,
+        values
+    );
+
+    return result.rows[0];
+};
+
 const deleteById = async (id) => {
     const result = await pool.query(
         "DELETE FROM categorii WHERE id_categorie = $1 RETURNING *",
@@ -62,5 +90,6 @@ module.exports = {
     getById,
     create,
     update,
+    patch,
     deleteById
 };

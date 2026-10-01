@@ -27,6 +27,15 @@ const updateService = async (req, res) => {
     res.json(service);
 };
 
+const patchService = async (req, res) => {
+    const service = await serviceService.patchService(
+        req.params.id,
+        req.body
+    );
+
+    res.json(service);
+};
+
 const deleteService = async (req, res) => {
     const service = await serviceService.deleteService(req.params.id);
 
@@ -38,5 +47,6 @@ module.exports = {
     getServiceById,
     createService,
     updateService,
+    patchService,
     deleteService
 };

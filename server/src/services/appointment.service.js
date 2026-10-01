@@ -15,6 +15,9 @@ const createAppointment = async (appointment) => {
 const updateAppointment = async (id, appointment) => {
     return await appointmentModel.update(id, appointment);
 };
+const patchAppointment = async (id, appointment) => {
+    return await appointmentModel.patch(id, appointment);
+};
 
 const deleteAppointment = async (id) => {
     return await appointmentModel.deleteById(id);
@@ -25,5 +28,6 @@ module.exports = {
     getAppointmentById,
     createAppointment,
     updateAppointment,
+    patchAppointment,
     deleteAppointment
 };

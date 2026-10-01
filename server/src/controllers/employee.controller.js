@@ -1,3 +1,4 @@
+const { patch } = require("../routes/service.routes");
 const employeeService = require("../services/employee.service");
 
 const getEmployees = async (req, res) => {
@@ -26,6 +27,14 @@ const updateEmployee = async (req, res) => {
 
     res.json(employee);
 };
+const patchEmployee = async (req, res) => {
+    const employee = await employeeService.patchEmployee(
+        req.params.id,
+        req.body
+    );
+
+    res.json(employee);
+};
 
 const deleteEmployee = async (req, res) => {
     const employee = await employeeService.deleteEmployee(req.params.id);
@@ -38,5 +47,6 @@ module.exports = {
     getEmployeeById,
     createEmployee,
     updateEmployee,
+    patchEmployee,
     deleteEmployee
 };
