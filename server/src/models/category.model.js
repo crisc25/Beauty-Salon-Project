@@ -63,7 +63,9 @@ const patch = async (id, category) => {
         fields.push(`descriere = $${values.length + 1}`);
         values.push(category.descriere);
     }
-
+    if (fields.length === 0) {
+        return null;
+    }
     values.push(id);
 
     const result = await pool.query(

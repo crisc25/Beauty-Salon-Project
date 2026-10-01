@@ -87,6 +87,9 @@ const patch = async (id, client) => {
         fields.push(`parola = $${values.length + 1}`);
         values.push(client.parola);
     }
+    if (fields.length === 0) {
+        return null;
+    }
 
     values.push(id);
 
@@ -109,7 +112,7 @@ const deleteById = async (id) => {
 
     return result.rows[0];
 };
-module.exports ={
+module.exports = {
     getAll,
     getById,
     create,

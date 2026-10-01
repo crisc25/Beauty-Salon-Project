@@ -110,6 +110,9 @@ const patch = async (id, employee) => {
         fields.push(`data_angajarii = $${values.length + 1}`);
         values.push(employee.data_angajarii);
     }
+    if (fields.length === 0) {
+        return null;
+    }
 
     values.push(id);
 

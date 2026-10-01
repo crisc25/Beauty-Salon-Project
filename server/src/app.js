@@ -1,4 +1,5 @@
 const express = require("express");
+const errorMiddleware = require("./middlewares/err.middleware");
 
 const app = express();
 
@@ -18,10 +19,12 @@ app.use("/api/angajati", employeeRoutes);
 app.use("/api/programari", appointmentRoutes);
 app.use("/api/angajati-servicii", employeeServiceRoutes);
 
+
 app.get("/", (req, res) => {
     res.json({
         message: "Beauty Salon API is running"
     });
 });
 
+app.use(errorMiddleware);
 module.exports = app;

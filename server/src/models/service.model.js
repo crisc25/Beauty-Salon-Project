@@ -97,6 +97,9 @@ const patch = async (id, service) => {
         fields.push(`descriere = $${values.length + 1}`);
         values.push(service.descriere);
     }
+    if (fields.length === 0) {
+        return null;
+    }
 
     values.push(id);
 

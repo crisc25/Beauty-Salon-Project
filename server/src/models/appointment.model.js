@@ -86,6 +86,9 @@ const patch = async (id, appointment) => {
         fields.push(`status = $${values.length + 1}`);
         values.push(appointment.status);
     }
+    if (fields.length === 0) {
+        return null;
+    }
 
     values.push(id);
 
@@ -108,11 +111,11 @@ const deleteById = async (id) => {
 
     return result.rows[0];
 };
-module.exports={
-   getAll,
+module.exports = {
+    getAll,
     getById,
     create,
     update,
     patch,
-    deleteById 
+    deleteById
 }
