@@ -1,61 +1,25 @@
-const pool = require("../../config/db");
+const categoryModel = require("../models/category.model");
 
 const getAllCategories = async () => {
-    const result = await pool.query(`
-        SELECT *
-        FROM categorii
-        ORDER BY id_categorie
-    `);
-
-    return result.rows;
+    return await categoryModel.getAll();
 };
 
 const getCategoryById = async (id) => {
-    const result = await pool.query(
-        "SELECT * FROM categorii WHERE id_categorie = $1",
-        [id]
-    );
-
-    return result.rows[0];
+    return await categoryModel.getById(id);
 };
+
+
 const createCategory = async (category) => {
-    const result = await pool.query(
-        `INSERT INTO categorii
-        (nume_categorie, descriere)
-        VALUES ($1, $2)
-        RETURNING *`,
-        [
-            category.nume_categorie,
-            category.descriere
-        ]
-    );
-
-    return result.rows[0];
+    return await categoryModel.create(category);
 };
+
 
 const updateCategory = async (id, category) => {
-    const result = await pool.query(
-        `UPDATE categorii
-         SET nume_categorie = $1,
-             descriere = $2
-         WHERE id_categorie = $3
-         RETURNING *`,
-        [
-            category.nume_categorie,
-            category.descriere,
-            id
-        ]
-    );
-
-    return result.rows[0];
+    return await categoryModel.update(id, category);
 };
-const deleteCategory = async (id) => {
-    const result = await pool.query(
-        "DELETE FROM categorii WHERE id_categorie = $1 RETURNING *",
-        [id]
-    );
 
-    return result.rows[0];
+const deleteCategory = async (id) => {
+    return await categoryModel.deleteById(id);
 };
 
 module.exports = {
