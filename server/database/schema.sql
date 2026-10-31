@@ -1,6 +1,4 @@
--- =========================
--- TIPURI ENUM
--- =========================
+
 
 CREATE TYPE rol_angajat AS ENUM (
     'admin',
@@ -16,9 +14,6 @@ CREATE TYPE status_programare AS ENUM (
 );
 
 
--- =========================
--- CATEGORII
--- =========================
 
 CREATE TABLE categorii (
     id_categorie SERIAL PRIMARY KEY,
@@ -27,9 +22,6 @@ CREATE TABLE categorii (
 );
 
 
--- =========================
--- CLIENTI
--- =========================
 
 CREATE TABLE clienti (
     id_client SERIAL PRIMARY KEY,
@@ -41,9 +33,7 @@ CREATE TABLE clienti (
 );
 
 
--- =========================
--- ANGAJATI
--- =========================
+
 
 CREATE TABLE angajati (
     id_angajat SERIAL PRIMARY KEY,
@@ -58,9 +48,6 @@ CREATE TABLE angajati (
 );
 
 
--- =========================
--- SERVICII
--- =========================
 
 CREATE TABLE servicii (
     id_serviciu SERIAL PRIMARY KEY,
@@ -77,9 +64,6 @@ CREATE TABLE servicii (
 );
 
 
--- =========================
--- PROGRAMARI
--- =========================
 
 CREATE TABLE programari (
     id_programare SERIAL PRIMARY KEY,
@@ -103,9 +87,7 @@ CREATE TABLE programari (
 );
 
 
--- =========================
--- ANGAJATI_SERVICII
--- =========================
+
 
 CREATE TABLE angajati_servicii (
     id_angajat INTEGER NOT NULL,

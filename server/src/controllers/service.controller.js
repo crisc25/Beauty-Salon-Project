@@ -2,7 +2,7 @@ const serviceService = require("../services/service.service");
 
 const getServices = async (req, res) => {
     const services = await serviceService.getAllServices();
-
+   
     res.json(services);
 };
 

@@ -18,6 +18,7 @@ const getById = async (id) => {
 
     return result.rows[0];
 };
+
 const create = async (employee) => {
     const result = await pool.query(
         `INSERT INTO angajati
@@ -38,6 +39,7 @@ const create = async (employee) => {
 
     return result.rows[0];
 };
+
 const update = async (id, employee) => {
     const result = await pool.query(
         `UPDATE angajati

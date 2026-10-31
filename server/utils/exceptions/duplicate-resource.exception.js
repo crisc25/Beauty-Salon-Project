@@ -1,9 +1,10 @@
-class DuplicateResourceException extends Error {
-    constructor(message) {
-        super(message);
-        this.name = "DuplicateResourceException";
-        this.statusCode = 409;
-    }
-}
+const DuplicateResourceException = (message) => {
+    const error = new Error(message);
+
+    error.name = "DuplicateResourceException";
+    error.statusCode = 409;
+
+    return error;
+};
 
 module.exports = DuplicateResourceException;

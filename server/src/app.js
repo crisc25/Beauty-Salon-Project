@@ -20,11 +20,26 @@ app.use("/api/programari", appointmentRoutes);
 app.use("/api/angajati-servicii", employeeServiceRoutes);
 
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
     res.json({
         message: "Beauty Salon API is running"
     });
 });
 
+
+// Tratarea rutelor inexistente
+app.use((req, res, next) => {
+    const error = new Error(
+        `Ruta ${req.method} ${req.originalUrl} nu există`
+    );
+
+    error.statusCode = 404;
+    error.name = "RouteNotFoundException";
+
+    next(error);
+});
+
+// Middleware global de gestionare a erorilor
 app.use(errorMiddleware);
+
 module.exports = app;

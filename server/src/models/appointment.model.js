@@ -10,6 +10,7 @@ const getAll = async () => {
     return result.rows;
 };
 
+
 const getById = async (id) => {
     const result = await pool.query(
         "SELECT * FROM programari WHERE id_programare = $1",
@@ -18,6 +19,8 @@ const getById = async (id) => {
 
     return result.rows[0];
 };
+
+
 const create = async (appointment) => {
     const result = await pool.query(
         `INSERT INTO programari
@@ -35,6 +38,7 @@ const create = async (appointment) => {
 
     return result.rows[0];
 };
+
 const update = async (id, appointment) => {
     const result = await pool.query(
         `UPDATE programari
@@ -111,6 +115,7 @@ const deleteById = async (id) => {
 
     return result.rows[0];
 };
+
 module.exports = {
     getAll,
     getById,

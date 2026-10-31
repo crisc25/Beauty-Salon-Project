@@ -9,6 +9,7 @@ const getAll = async () => {
 
     return result.rows;
 };
+
 const getById = async (id) => {
     const result = await pool.query(
         "SELECT * FROM categorii WHERE id_categorie = $1",

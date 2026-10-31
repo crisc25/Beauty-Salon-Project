@@ -12,7 +12,7 @@ const getClientById = async (id) => {
     const client = await clientModel.getById(id);
 
     if (!client) {
-        throw new ResourceNotFoundException(
+        throw  ResourceNotFoundException(
             `Clientul cu ID-ul ${id} nu a fost găsit`
         );
     }
@@ -24,7 +24,7 @@ const getClientById = async (id) => {
 const createClient = async (client) => {
     if (!client.nume || !client.prenume || !client.telefon ||
         !client.email || !client.parola) {
-        throw new InvalidDataException(
+        throw  InvalidDataException(
             "Toate câmpurile clientului sunt obligatorii"
         );
     }
@@ -33,7 +33,7 @@ const createClient = async (client) => {
         return await clientModel.create(client);
     } catch (error) {
         if (error.code === "23505") {
-            throw new DuplicateResourceException(
+            throw DuplicateResourceException(
                 `Clientul cu email-ul ${client.email} există deja`
             );
         }
@@ -47,7 +47,7 @@ const updateClient = async (id, client) => {
     const updatedClient = await clientModel.update(id, client);
 
     if (!updatedClient) {
-        throw new ResourceNotFoundException(
+        throw  ResourceNotFoundException(
             `Clientul cu ID-ul ${id} nu a fost găsit`
         );
     }
@@ -60,13 +60,13 @@ const patchClient = async (id, client) => {
     const patchedClient = await clientModel.patch(id, client);
 
     if (patchedClient === null) {
-        throw new InvalidDataException(
+        throw  InvalidDataException(
             "Trebuie specificat cel puțin un câmp pentru modificare"
         );
     }
 
     if (!patchedClient) {
-        throw new ResourceNotFoundException(
+        throw  ResourceNotFoundException(
             `Clientul cu ID-ul ${id} nu a fost găsit`
         );
     }
@@ -80,7 +80,7 @@ const deleteClient = async (id) => {
     const deletedClient = await clientModel.deleteById(id);
 
     if (!deletedClient) {
-        throw new ResourceNotFoundException(
+        throw  ResourceNotFoundException(
             `Clientul cu ID-ul ${id} nu a fost găsit`
         );
     }
