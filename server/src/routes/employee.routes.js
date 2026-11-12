@@ -1,3 +1,4 @@
+
 const express = require("express");
 
 const {
@@ -9,13 +10,18 @@ const {
     deleteEmployee
 } = require("../controllers/employee.controller");
 
+const authenticateAdmin = require("../middlewares/auth.middlewares");
+
 const router = express.Router();
 
+// Rute publice
 router.get("/", getEmployees);
 router.get("/:id", getEmployeeById);
-router.post("/", createEmployee);
-router.put("/:id", updateEmployee);
-router.patch("/:id", patchEmployee);
-router.delete("/:id", deleteEmployee);
+
+// Rute protejate
+router.post("/", authenticateAdmin, createEmployee);
+router.put("/:id", authenticateAdmin, updateEmployee);
+router.patch("/:id", authenticateAdmin, patchEmployee);
+router.delete("/:id", authenticateAdmin, deleteEmployee);
 
 module.exports = router;

@@ -1,3 +1,4 @@
+
 const express = require("express");
 
 const {
@@ -6,18 +7,21 @@ const {
     createService,
     updateService,
     patchService,
-     deleteService
+    deleteService
 } = require("../controllers/service.controller");
+
+const authenticateAdmin = require("../middlewares/auth.middlewares");
 
 const router = express.Router();
 
+// Rute publice
 router.get("/", getServices);
 router.get("/:id", getServiceById);
-router.post("/", createService);
-router.put("/:id", updateService);
-router.patch("/:id", patchService);
-router.delete("/:id", deleteService);
 
-
+// Rute protejate
+router.post("/", authenticateAdmin, createService);
+router.put("/:id", authenticateAdmin, updateService);
+router.patch("/:id", authenticateAdmin, patchService);
+router.delete("/:id", authenticateAdmin, deleteService);
 
 module.exports = router;

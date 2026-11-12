@@ -1,3 +1,4 @@
+const e = require("express");
 const pool = require("../../config/db");
 
 const getAll = async () => {
@@ -43,10 +44,22 @@ const deleteByIds = async (id_angajat, id_serviciu) => {
 
     return result.rows[0];
 };
+const exists = async (id_angajat, id_serviciu) => {
+    const result = await pool.query(
+        `SELECT 1
+         FROM angajati_servicii
+         WHERE id_angajat = $1
+         AND id_serviciu = $2`,
+        [id_angajat, id_serviciu]
+    );
+
+    return result.rowCount > 0;
+};
 
 module.exports = {
     getAll,
     getByEmployee,
     add,
-    deleteByIds
+    deleteByIds,
+    exists
 };

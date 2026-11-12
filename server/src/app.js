@@ -1,6 +1,6 @@
 const express = require("express");
 const errorMiddleware = require("./middlewares/err.middleware");
-
+const adminRoutes = require("./routes/admin.routes");
 const app = express();
 
 app.use(express.json());
@@ -18,6 +18,7 @@ app.use("/api/clienti", clientRoutes);
 app.use("/api/angajati", employeeRoutes);
 app.use("/api/programari", appointmentRoutes);
 app.use("/api/angajati-servicii", employeeServiceRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 app.get("/", (_req, res) => {

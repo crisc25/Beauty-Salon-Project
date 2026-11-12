@@ -3,16 +3,25 @@ const ResourceNotFoundException = require("../../utils/exceptions/resource-not-f
 const InvalidDataException = require("../../utils/exceptions/invalid-data.exception");
 const DuplicateResourceException = require("../../utils/exceptions/duplicate-resource.exception");
 
+
+const validateId = (id) => {
+    if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
+        throw InvalidDataException("ID-ul serviciului este invalid");
+    }
+};
+
 const getAllServices = async () => {
     return await serviceModel.getAll();
 };
 
 
 const getServiceById = async (id) => {
+    validateId(id);
+
     const service = await serviceModel.getById(id);
 
     if (!service) {
-        throw  ResourceNotFoundException(
+        throw ResourceNotFoundException(
             `Serviciul cu ID-ul ${id} nu a fost găsit`
         );
     }
@@ -59,17 +68,34 @@ const createService = async (service) => {
 };
 
 const updateService = async (id, service) => {
+    validateId(id);
+
     if (
         !service ||
+        typeof service !== "object" ||
+        Array.isArray(service)
+    ) {
+        throw InvalidDataException("Datele serviciului sunt invalide");
+    }
+
+    if (
         !service.id_categorie ||
-        !service.denumire ||
+        typeof service.denumire !== "string" ||
+        !service.denumire.trim() ||
         !service.durata_minute ||
         !service.pret ||
         typeof service.is_active !== "boolean"
     ) {
-        throw  InvalidDataException(
+        throw InvalidDataException(
             "Toate câmpurile obligatorii ale serviciului trebuie completate"
         );
+    }
+
+    if (
+        !Number.isInteger(Number(service.id_categorie)) ||
+        Number(service.id_categorie) <= 0
+    ) {
+        throw InvalidDataException("ID-ul categoriei este invalid");
     }
 
     if (
@@ -78,7 +104,7 @@ const updateService = async (id, service) => {
         !Number.isFinite(Number(service.pret)) ||
         Number(service.pret) <= 0
     ) {
-        throw  InvalidDataException(
+        throw InvalidDataException(
             "Durata și prețul trebuie să fie numere pozitive valide"
         );
     }
@@ -95,18 +121,22 @@ const updateService = async (id, service) => {
         return updatedService;
     } catch (error) {
         if (error.code === "23505") {
-            throw  DuplicateResourceException(
-                "Serviciul există deja"
-            );
+            throw DuplicateResourceException("Serviciul există deja");
         }
         throw error;
     }
 };
 
 const patchService = async (id, service) => {
+    validateId(id);
+
     const allowedFields = [
-        "id_categorie", "denumire", "durata_minute",
-        "pret", "is_active", "descriere"
+        "id_categorie",
+        "denumire",
+        "durata_minute",
+        "pret",
+        "is_active",
+        "descriere"
     ];
 
     if (!service || typeof service !== "object" || Array.isArray(service)) {
@@ -116,13 +146,13 @@ const patchService = async (id, service) => {
     const fields = Object.keys(service);
 
     if (fields.length === 0) {
-        throw  InvalidDataException(
+        throw InvalidDataException(
             "Trebuie specificat cel puțin un câmp pentru modificare"
         );
     }
 
     if (fields.some(field => !allowedFields.includes(field))) {
-        throw  InvalidDataException(
+        throw InvalidDataException(
             "Cererea conține câmpuri care nu pot fi modificate"
         );
     }
@@ -131,7 +161,22 @@ const patchService = async (id, service) => {
         service[field] === null ||
         (typeof service[field] === "string" && !service[field].trim())
     )) {
-        throw  InvalidDataException("Valorile câmpurilor nu pot fi goale");
+        throw InvalidDataException("Valorile câmpurilor nu pot fi goale");
+    }
+
+    if (
+        service.id_categorie !== undefined &&
+        (!Number.isInteger(Number(service.id_categorie)) ||
+         Number(service.id_categorie) <= 0)
+    ) {
+        throw InvalidDataException("ID-ul categoriei este invalid");
+    }
+
+    if (
+        service.denumire !== undefined &&
+        typeof service.denumire !== "string"
+    ) {
+        throw InvalidDataException("Denumirea trebuie să fie text");
     }
 
     if (
@@ -139,7 +184,9 @@ const patchService = async (id, service) => {
         (!Number.isInteger(Number(service.durata_minute)) ||
          Number(service.durata_minute) <= 0)
     ) {
-        throw  InvalidDataException("Durata trebuie să fie un număr întreg pozitiv");
+        throw InvalidDataException(
+            "Durata trebuie să fie un număr întreg pozitiv"
+        );
     }
 
     if (
@@ -157,6 +204,13 @@ const patchService = async (id, service) => {
         throw InvalidDataException("is_active trebuie să fie boolean");
     }
 
+    if (
+        service.descriere !== undefined &&
+        typeof service.descriere !== "string"
+    ) {
+        throw InvalidDataException("Descrierea trebuie să fie text");
+    }
+
     try {
         const patchedService = await serviceModel.patch(id, service);
 
@@ -171,14 +225,14 @@ const patchService = async (id, service) => {
         if (error.code === "23505") {
             throw DuplicateResourceException("Serviciul există deja");
         }
+
         throw error;
     }
 };
 
-
-
-
 const deleteService = async (id) => {
+    validateId(id);
+
     const deletedService = await serviceModel.deleteById(id);
 
     if (!deletedService) {
@@ -189,7 +243,6 @@ const deleteService = async (id) => {
 
     return deletedService;
 };
-
 module.exports = {
     getAllServices,
     getServiceById,

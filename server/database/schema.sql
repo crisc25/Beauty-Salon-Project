@@ -103,3 +103,10 @@ CREATE TABLE angajati_servicii (
         FOREIGN KEY (id_serviciu)
         REFERENCES servicii(id_serviciu)
 );
+
+
+CREATE TABLE admins (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);

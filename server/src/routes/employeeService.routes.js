@@ -1,3 +1,4 @@
+
 const express = require("express");
 
 const {
@@ -7,11 +8,16 @@ const {
     deleteEmployeeService
 } = require("../controllers/employeeService.controller");
 
+const authenticateAdmin = require("../middlewares/auth.middlewares");
+
 const router = express.Router();
 
+// Rute publice
 router.get("/", getEmployeeServices);
 router.get("/angajat/:id_angajat", getEmployeeServicesByEmployee);
-router.post("/", addEmployeeService);
-router.delete("/:id_angajat/:id_serviciu", deleteEmployeeService);
+
+// Rute protejate
+router.post("/", authenticateAdmin, addEmployeeService);
+router.delete("/:id_angajat/:id_serviciu", authenticateAdmin, deleteEmployeeService);
 
 module.exports = router;

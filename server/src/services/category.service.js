@@ -3,12 +3,21 @@ const ResourceNotFoundException = require("../../utils/exceptions/resource-not-f
 const InvalidDataException = require("../../utils/exceptions/invalid-data.exception");
 const DuplicateResourceException = require("../../utils/exceptions/duplicate-resource.exception");
 
+
+const validateId = (id) => {
+    if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
+        throw InvalidDataException("ID-ul categoriei este invalid");
+    }
+};
+
 const getAllCategories = async () => {
     return await categoryModel.getAll();
 };
 
 
 const getCategoryById = async (id) => {
+    validateId(id);
+
     const category = await categoryModel.getById(id);
 
     if (!category) {
@@ -43,10 +52,32 @@ const createCategory = async (category) => {
 };
 
 const updateCategory = async (id, category) => {
-    if (!category || typeof category.nume_categorie !== "string" ||
-        !category.nume_categorie.trim()) {
-        throw  InvalidDataException(
+    validateId(id);
+
+    if (
+        !category ||
+        typeof category !== "object" ||
+        Array.isArray(category)
+    ) {
+        throw InvalidDataException("Datele categoriei sunt invalide");
+    }
+
+    if (
+        typeof category.nume_categorie !== "string" ||
+        !category.nume_categorie.trim()
+    ) {
+        throw InvalidDataException(
             "Denumirea categoriei este obligatorie"
+        );
+    }
+
+    if (
+        category.descriere !== undefined &&
+        category.descriere !== null &&
+        typeof category.descriere !== "string"
+    ) {
+        throw InvalidDataException(
+            "Descrierea categoriei trebuie să fie text"
         );
     }
 
@@ -62,19 +93,25 @@ const updateCategory = async (id, category) => {
         return updatedCategory;
     } catch (error) {
         if (error.code === "23505") {
-            throw  DuplicateResourceException(
-                "Categoria există deja"
-            );
+            throw DuplicateResourceException("Categoria există deja");
         }
+
         throw error;
     }
 };
 
 const patchCategory = async (id, category) => {
-    if (!category || typeof category !== "object" || Array.isArray(category)) {
-        throw  InvalidDataException("Datele trimise sunt invalide");
+    validateId(id);
+
+    if (
+        !category ||
+        typeof category !== "object" ||
+        Array.isArray(category)
+    ) {
+        throw InvalidDataException("Datele trimise sunt invalide");
     }
 
+    const allowedFields = ["nume_categorie", "descriere"];
     const fields = Object.keys(category);
 
     if (fields.length === 0) {
@@ -83,21 +120,31 @@ const patchCategory = async (id, category) => {
         );
     }
 
-    if (fields.some(field =>
-        !["nume_categorie", "descriere"].includes(field)
-    )) {
-        throw  InvalidDataException(
+    if (fields.some(field => !allowedFields.includes(field))) {
+        throw InvalidDataException(
             "Cererea conține câmpuri care nu pot fi modificate"
         );
     }
 
     if (
         category.nume_categorie !== undefined &&
-        (typeof category.nume_categorie !== "string" ||
-            !category.nume_categorie.trim())
+        (
+            typeof category.nume_categorie !== "string" ||
+            !category.nume_categorie.trim()
+        )
     ) {
         throw InvalidDataException(
             "Denumirea categoriei nu poate fi goală"
+        );
+    }
+
+    if (
+        category.descriere !== undefined &&
+        category.descriere !== null &&
+        typeof category.descriere !== "string"
+    ) {
+        throw InvalidDataException(
+            "Descrierea categoriei trebuie să fie text"
         );
     }
 
@@ -105,7 +152,7 @@ const patchCategory = async (id, category) => {
         const patchedCategory = await categoryModel.patch(id, category);
 
         if (!patchedCategory) {
-            throw  ResourceNotFoundException(
+            throw ResourceNotFoundException(
                 `Categoria cu ID-ul ${id} nu a fost găsită`
             );
         }
@@ -117,12 +164,14 @@ const patchCategory = async (id, category) => {
                 "Categoria există deja"
             );
         }
+
         throw error;
     }
 };
 
-
 const deleteCategory = async (id) => {
+    validateId(id);
+
     const deletedCategory = await categoryModel.deleteById(id);
 
     if (!deletedCategory) {

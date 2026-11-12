@@ -1,3 +1,4 @@
+
 const express = require("express");
 
 const {
@@ -9,13 +10,18 @@ const {
     deleteAppointment
 } = require("../controllers/appointment.controller");
 
+const authenticateAdmin = require("../middlewares/auth.middlewares");
+
 const router = express.Router();
 
+// Rute publice – nu necesită autentificare
 router.get("/", getAppointments);
 router.get("/:id", getAppointmentById);
-router.post("/", createAppointment);
-router.put("/:id", updateAppointment);
-router.patch("/:id", patchAppointment);
-router.delete("/:id", deleteAppointment);
+
+// Rute protejate – necesită token JWT de administrator
+router.post("/", authenticateAdmin, createAppointment);
+router.put("/:id", authenticateAdmin, updateAppointment);
+router.patch("/:id", authenticateAdmin, patchAppointment);
+router.delete("/:id", authenticateAdmin, deleteAppointment);
 
 module.exports = router;

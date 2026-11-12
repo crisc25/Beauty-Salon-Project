@@ -1,3 +1,4 @@
+
 const express = require("express");
 
 const {
@@ -9,13 +10,18 @@ const {
     deleteClient
 } = require("../controllers/client.controller");
 
+const authenticateAdmin = require("../middlewares/auth.middlewares");
+
 const router = express.Router();
 
+// Rute publice
 router.get("/", getClients);
 router.get("/:id", getClientById);
-router.post("/", createClient);
-router.put("/:id", updateClient);
-router.patch("/:id", patchClient);
-router.delete("/:id", deleteClient);
+
+// Rute protejate
+router.post("/", authenticateAdmin, createClient);
+router.put("/:id", authenticateAdmin, updateClient);
+router.patch("/:id", authenticateAdmin, patchClient);
+router.delete("/:id", authenticateAdmin, deleteClient);
 
 module.exports = router;
