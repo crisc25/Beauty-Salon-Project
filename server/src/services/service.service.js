@@ -10,10 +10,9 @@ const validateId = (id) => {
     }
 };
 
-const getAllServices = async () => {
-    return await serviceModel.getAll();
+const getAllServices = async (filters) => {
+    return await serviceModel.getAll(filters);
 };
-
 
 const getServiceById = async (id) => {
     validateId(id);
@@ -39,7 +38,7 @@ const createService = async (service) => {
         !service.pret ||
         typeof service.is_active !== "boolean"
     ) {
-        throw  InvalidDataException(
+        throw InvalidDataException(
             "Câmpurile obligatorii ale serviciului sunt invalide sau lipsesc"
         );
     }
@@ -50,7 +49,7 @@ const createService = async (service) => {
         !Number.isFinite(Number(service.pret)) ||
         Number(service.pret) <= 0
     ) {
-        throw  InvalidDataException(
+        throw InvalidDataException(
             "Durata și prețul trebuie să fie numere pozitive valide"
         );
     }
@@ -59,7 +58,7 @@ const createService = async (service) => {
         return await serviceModel.create(service);
     } catch (error) {
         if (error.code === "23505") {
-            throw  DuplicateResourceException(
+            throw DuplicateResourceException(
                 "Serviciul există deja"
             );
         }
@@ -167,7 +166,7 @@ const patchService = async (id, service) => {
     if (
         service.id_categorie !== undefined &&
         (!Number.isInteger(Number(service.id_categorie)) ||
-         Number(service.id_categorie) <= 0)
+            Number(service.id_categorie) <= 0)
     ) {
         throw InvalidDataException("ID-ul categoriei este invalid");
     }
@@ -182,7 +181,7 @@ const patchService = async (id, service) => {
     if (
         service.durata_minute !== undefined &&
         (!Number.isInteger(Number(service.durata_minute)) ||
-         Number(service.durata_minute) <= 0)
+            Number(service.durata_minute) <= 0)
     ) {
         throw InvalidDataException(
             "Durata trebuie să fie un număr întreg pozitiv"
@@ -192,7 +191,7 @@ const patchService = async (id, service) => {
     if (
         service.pret !== undefined &&
         (!Number.isFinite(Number(service.pret)) ||
-         Number(service.pret) <= 0)
+            Number(service.pret) <= 0)
     ) {
         throw InvalidDataException("Prețul trebuie să fie un număr pozitiv");
     }

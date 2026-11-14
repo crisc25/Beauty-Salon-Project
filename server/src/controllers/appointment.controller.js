@@ -1,11 +1,25 @@
 const appointmentService = require("../services/appointment.service");
 
 const getAppointments = async (req, res) => {
-    const appointments = await appointmentService.getAllAppointments();
+    const filters = {
+        search: req.query.search,
+        status: req.query.status,
+        data: req.query.data,
+        id_angajat: req.query.id_angajat,
+        id_serviciu: req.query.id_serviciu,
+        data_start: req.query.data_start,
+        data_end: req.query.data_end,
+
+        sortBy: req.query.sortBy,
+        direction: req.query.direction,
+        page: req.query.page,
+        size: req.query.size
+    };
+
+    const appointments = await appointmentService.getAllAppointments(filters);
 
     res.json(appointments);
 };
-
 const getAppointmentById = async (req, res) => {
     const appointment = await appointmentService.getAppointmentById(
         req.params.id
@@ -45,6 +59,18 @@ const deleteAppointment = async (req, res) => {
 
     res.json(appointment);
 };
+const checkEmployeeAvailability = async (req, res) => {
+    const { id_angajat } = req.params;
+    const { id_serviciu, data_ora } = req.query;
+
+    const result = await appointmentService.checkEmployeeAvailability(
+        id_angajat,
+        id_serviciu,
+        data_ora
+    );
+
+    res.json(result);
+};
 
 module.exports = {
     getAppointments,
@@ -52,5 +78,6 @@ module.exports = {
     createAppointment,
     updateAppointment,
     patchAppointment,
+    checkEmployeeAvailability,
     deleteAppointment
 };

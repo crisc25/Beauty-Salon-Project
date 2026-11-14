@@ -2,11 +2,18 @@ const clientService = require("../services/client.service");
 
 
 const getClients = async (req, res) => {
-    const clients = await clientService.getAllClients();
+    const filters = {
+        search: req.query.search,
+        sortBy: req.query.sortBy,
+        direction: req.query.direction,
+        page: req.query.page,
+        size: req.query.size
+    };
+
+    const clients = await clientService.getAllClients(filters);
 
     res.json(clients);
 };
-
 
 const getClientById = async (req, res) => {
     const client = await clientService.getClientById(req.params.id);

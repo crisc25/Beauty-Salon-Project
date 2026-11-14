@@ -1,11 +1,21 @@
 const categoryService = require("../services/category.service");
 
 
+
 const getCategories = async (req, res) => {
-    const categories = await categoryService.getAllCategories();
+    const filters = {
+        search: req.query.search,
+        sortBy: req.query.sortBy,
+        direction: req.query.direction,
+        page: req.query.page,
+        size: req.query.size
+    };
+
+    const categories = await categoryService.getAllCategories(filters);
 
     res.json(categories);
 };
+
 
 
 const getCategoryById = async (req, res) => {
@@ -54,5 +64,5 @@ module.exports = {
     createCategory,
     updateCategory,
     patchCategory,
-     deleteCategory
+    deleteCategory
 };

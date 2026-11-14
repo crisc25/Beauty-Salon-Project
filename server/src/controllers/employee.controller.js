@@ -1,11 +1,22 @@
 
 const employeeService = require("../services/employee.service");
 
+
 const getEmployees = async (req, res) => {
-    const employees = await employeeService.getAllEmployees();
+    const filters = {
+        search: req.query.search,
+        id_serviciu: req.query.id_serviciu,
+        sortBy: req.query.sortBy,
+        direction: req.query.direction,
+        page: req.query.page,
+        size: req.query.size
+    };
+
+    const employees = await employeeService.getAllEmployees(filters);
 
     res.json(employees);
 };
+
 
 const getEmployeeById = async (req, res) => {
     const employee = await employeeService.getEmployeeById(req.params.id);

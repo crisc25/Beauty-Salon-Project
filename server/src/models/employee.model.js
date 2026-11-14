@@ -1,14 +1,87 @@
 const pool = require("../../config/db");
 
-const getAll = async () => {
-    const result = await pool.query(`
-        SELECT *
-        FROM angajati
-        ORDER BY id_angajat
-    `);
 
-    return result.rows;
+const getAll = async (filters = {}) => {
+    const conditions = [];
+    const values = [];
+
+    if (filters.search) {
+        values.push(`%${filters.search}%`);
+        conditions.push(`(
+            nume ILIKE $${values.length}
+            OR prenume ILIKE $${values.length}
+            OR CONCAT(nume, ' ', prenume) ILIKE $${values.length}
+        )`);
+    }
+
+    if (filters.id_serviciu !== undefined) {
+        values.push(filters.id_serviciu);
+        conditions.push(`EXISTS (
+            SELECT 1
+            FROM angajati_servicii ase
+            WHERE ase.id_angajat = angajati.id_angajat
+            AND ase.id_serviciu = $${values.length}
+        )`);
+    }
+
+    const whereClause = conditions.length
+        ? `WHERE ${conditions.join(" AND ")}`
+        : "";
+
+    // Sortare
+    const allowedSortFields = ["nume", "prenume"];
+
+    const sortBy = allowedSortFields.includes(filters.sortBy)
+        ? filters.sortBy
+        : "id_angajat";
+
+    const direction = filters.direction?.toLowerCase() === "desc"
+        ? "DESC"
+        : "ASC";
+
+    // Paginare
+    const page = Math.max(0, Number.parseInt(filters.page, 10) || 0);
+    const size = Math.min(
+        100,
+        Math.max(1, Number.parseInt(filters.size, 10) || 10)
+    );
+
+    const offset = page * size;
+
+    // Numărul total de angajați după filtrare
+    const countResult = await pool.query(
+        `SELECT COUNT(*) AS total
+         FROM angajati
+         ${whereClause}`,
+        values
+    );
+
+    const total = Number(countResult.rows[0].total);
+    const totalPages = Math.ceil(total / size);
+
+    // Angajații paginii curente
+    const result = await pool.query(
+        `SELECT *
+         FROM angajati
+         ${whereClause}
+         ORDER BY ${sortBy} ${direction}, id_angajat ASC
+         LIMIT $${values.length + 1}
+         OFFSET $${values.length + 2}`,
+        [...values, size, offset]
+    );
+
+    return {
+        data: result.rows,
+        pagination: {
+            total,
+            page,
+            size,
+            totalPages
+        }
+    };
 };
+
+
 
 const getById = async (id) => {
     const result = await pool.query(

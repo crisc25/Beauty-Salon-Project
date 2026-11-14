@@ -1,8 +1,18 @@
 const serviceService = require("../services/service.service");
 
 const getServices = async (req, res) => {
-    const services = await serviceService.getAllServices();
-   
+    const filters = {
+        search: req.query.search,
+        id_categorie: req.query.id_categorie,
+        is_active: req.query.is_active !== undefined
+            ? req.query.is_active === "true"
+            : undefined,
+        minPrice: req.query.minPrice,
+        maxPrice: req.query.maxPrice
+    };
+
+    const services = await serviceService.getAllServices(filters);
+
     res.json(services);
 };
 

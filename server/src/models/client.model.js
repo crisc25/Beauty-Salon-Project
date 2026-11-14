@@ -1,14 +1,72 @@
 const pool = require("../../config/db");
 
-const getAll = async () => {
-    const result = await pool.query(`
-        SELECT *
-        FROM clienti
-        ORDER BY id_client
-    `);
+const getAll = async (filters = {}) => {
+    const values = [];
+    let whereClause = "";
 
-    return result.rows;
+    if (filters.search) {
+        values.push(`%${filters.search}%`);
+
+        whereClause = `
+            WHERE nume ILIKE $1
+               OR prenume ILIKE $1
+               OR CONCAT(nume, ' ', prenume) ILIKE $1
+        `;
+    }
+
+    // Sortare
+    const allowedSortFields = ["nume", "prenume"];
+
+    const sortBy = allowedSortFields.includes(filters.sortBy)
+        ? filters.sortBy
+        : "nume";
+
+    const direction = filters.direction?.toLowerCase() === "desc"
+        ? "DESC"
+        : "ASC";
+
+    // Paginare
+    const page = Math.max(0, Number.parseInt(filters.page, 10) || 0);
+    const size = Math.min(
+        100,
+        Math.max(1, Number.parseInt(filters.size, 10) || 10)
+    );
+
+    const offset = page * size;
+
+    // Numărul total de clienți după căutare
+    const countResult = await pool.query(
+        `SELECT COUNT(*) AS total
+         FROM clienti
+         ${whereClause}`,
+        values
+    );
+
+    const total = Number(countResult.rows[0].total);
+    const totalPages = Math.ceil(total / size);
+
+    // Clienții paginii curente
+    const result = await pool.query(
+        `SELECT id_client, nume, prenume, telefon, email
+         FROM clienti
+         ${whereClause}
+         ORDER BY ${sortBy} ${direction}, id_client ASC
+         LIMIT $${values.length + 1}
+         OFFSET $${values.length + 2}`,
+        [...values, size, offset]
+    );
+
+    return {
+        data: result.rows,
+        pagination: {
+            total,
+            page,
+            size,
+            totalPages
+        }
+    };
 };
+
 const getById = async (id) => {
     const result = await pool.query(
         "SELECT * FROM clienti WHERE id_client = $1",

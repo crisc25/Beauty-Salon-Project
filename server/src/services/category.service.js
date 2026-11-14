@@ -10,8 +10,8 @@ const validateId = (id) => {
     }
 };
 
-const getAllCategories = async () => {
-    return await categoryModel.getAll();
+const getAllCategories = async (filters) => {
+    return await categoryModel.getAll(filters);
 };
 
 
@@ -43,7 +43,7 @@ const createCategory = async (category) => {
         return await categoryModel.create(category);
     } catch (error) {
         if (error.code === "23505") {
-            throw  DuplicateResourceException(
+            throw DuplicateResourceException(
                 "Categoria există deja"
             );
         }

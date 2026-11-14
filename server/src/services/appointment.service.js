@@ -7,8 +7,8 @@ const employeeServiceModel = require("../models/employeeService.model");
 const ResourceNotFoundException = require("../../utils/exceptions/resource-not-found.exception");
 const InvalidDataException = require("../../utils/exceptions/invalid-data.exception");
 
-const getAllAppointments = async () => {
-    return await appointmentModel.getAll();
+const getAllAppointments = async (filters) => {
+    return await appointmentModel.getAll(filters);
 };
 
 const getAppointmentById = async (id) => {
@@ -39,28 +39,43 @@ const validateId = (value, fieldName) => {
 };
 
 // Verifică formatul și validitatea datei și orei
+
 const validateDateTime = (value) => {
-    if (
-        typeof value !== "string" ||
-        !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(value)
-    ) {
+    const match = typeof value === "string"
+        ? value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/)
+        : null;
+
+    if (!match) {
         throw InvalidDataException(
             "Data și ora trebuie să respecte formatul YYYY-MM-DDTHH:mm:ss"
         );
     }
 
-    const date = new Date(value);
+    const [, year, month, day, hour, minute, second = "00"] = match;
+
+    const date = new Date(Date.UTC(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        Number(hour),
+        Number(minute),
+        Number(second)
+    ));
 
     if (
-        Number.isNaN(date.getTime()) ||
-        date.toISOString().slice(0, 19) !==
-        (value.length === 16 ? `${value}:00` : value)
+        date.getUTCFullYear() !== Number(year) ||
+        date.getUTCMonth() !== Number(month) - 1 ||
+        date.getUTCDate() !== Number(day) ||
+        date.getUTCHours() !== Number(hour) ||
+        date.getUTCMinutes() !== Number(minute) ||
+        date.getUTCSeconds() !== Number(second)
     ) {
         throw InvalidDataException(
             "Data și ora programării sunt invalide"
         );
     }
 };
+
 
 // Validare completă pentru POST și PUT
 const validateAppointment = (appointment) => {
@@ -133,6 +148,54 @@ const validateAppointmentRelations = async (appointment) => {
         );
     }
 };
+
+
+const checkEmployeeAvailability = async (id_angajat, id_serviciu, data_ora) => {
+    validateId(id_angajat, "ID-ul angajatului");
+    validateId(id_serviciu, "ID-ul serviciului");
+    validateDateTime(data_ora);
+
+    const employee = await employeeModel.getById(id_angajat);
+
+    if (!employee) {
+        throw ResourceNotFoundException("Angajatul nu există");
+    }
+
+    const service = await serviceModel.getById(id_serviciu);
+
+    if (!service) {
+        throw ResourceNotFoundException("Serviciul nu există");
+    }
+
+    if (service.is_active !== true) {
+        throw InvalidDataException("Serviciul nu este activ");
+    }
+
+    const isAssigned = await employeeServiceModel.exists(
+        id_angajat,
+        id_serviciu
+    );
+
+    if (!isAssigned) {
+        throw InvalidDataException(
+            "Angajatul nu prestează serviciul ales"
+        );
+    }
+
+    const isOccupied = await appointmentModel.hasOverlappingAppointment(
+        id_angajat,
+        data_ora,
+        service.durata_minute
+    );
+
+    return {
+        disponibil: !isOccupied,
+        mesaj: isOccupied
+            ? "Angajatul are deja o programare în acest interval"
+            : "Angajatul este disponibil pentru intervalul solicitat"
+    };
+};
+
 // Crearea unei programări
 const createAppointment = async (appointment) => {
     validateAppointment(appointment);
@@ -287,5 +350,6 @@ module.exports = {
     createAppointment,
     updateAppointment,
     patchAppointment,
+    checkEmployeeAvailability,
     deleteAppointment
 };

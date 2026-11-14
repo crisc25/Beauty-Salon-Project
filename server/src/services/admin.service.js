@@ -3,11 +3,18 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const adminModel = require("../models/admin.model");
-
 const login = async (username, password) => {
+
+    // Verificăm dacă datele obligatorii au fost transmise
+    if (!username || !password) {
+        const error = new Error("Username și parola sunt obligatorii");
+        error.name = "InvalidDataException";
+        error.statusCode = 400;
+        throw error;
+    }
+
     // Căutăm administratorul în baza de date
     const admin = await adminModel.getByUsername(username);
-
     // Verificăm dacă administratorul există
     if (!admin) {
         const error = new Error("Username sau parolă incorectă");

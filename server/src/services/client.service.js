@@ -34,8 +34,8 @@ const validateClient = (client) => {
     }
 };
 
-const getAllClients = async () => {
-    return await clientModel.getAll();
+const getAllClients = async (filters) => {
+    return await clientModel.getAll(filters);
 };
 
 const getClientById = async (id) => {

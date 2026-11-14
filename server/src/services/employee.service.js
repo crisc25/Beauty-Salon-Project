@@ -69,10 +69,9 @@ const validateEmployee = (employee) => {
     }
 };
 
-const getAllEmployees = async () => {
-    return await employeeModel.getAll();
+const getAllEmployees = async (filters) => {
+    return await employeeModel.getAll(filters);
 };
-
 
 const getEmployeeById = async (id) => {
     validateId(id);
