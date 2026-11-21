@@ -1,10 +1,8 @@
 const express = require("express");
 const errorMiddleware = require("./middlewares/err.middleware");
+
 const adminRoutes = require("./routes/admin.routes");
-const app = express();
-
-app.use(express.json());
-
+const statisticsRoutes = require("./routes/statistics.routes");
 const serviceRoutes = require("./routes/service.routes");
 const categoryRoutes = require("./routes/category.routes");
 const clientRoutes = require("./routes/client.routes");
@@ -12,6 +10,11 @@ const employeeRoutes = require("./routes/employee.routes");
 const appointmentRoutes = require("./routes/appointment.routes");
 const employeeServiceRoutes = require("./routes/employeeService.routes");
 
+const app = express();
+
+app.use(express.json());
+
+app.use("/api/statistici", statisticsRoutes);
 app.use("/api/servicii", serviceRoutes);
 app.use("/api/categorii", categoryRoutes);
 app.use("/api/clienti", clientRoutes);

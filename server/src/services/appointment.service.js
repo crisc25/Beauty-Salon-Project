@@ -150,7 +150,7 @@ const validateAppointmentRelations = async (appointment) => {
 };
 
 
-const checkEmployeeAvailability = async (id_angajat, id_serviciu, data_ora) => {
+const checkEmployeeAvailability = async (id_angajat, id_serviciu, data_ora, excludeId = null) => {
     validateId(id_angajat, "ID-ul angajatului");
     validateId(id_serviciu, "ID-ul serviciului");
     validateDateTime(data_ora);
@@ -185,7 +185,8 @@ const checkEmployeeAvailability = async (id_angajat, id_serviciu, data_ora) => {
     const isOccupied = await appointmentModel.hasOverlappingAppointment(
         id_angajat,
         data_ora,
-        service.durata_minute
+        service.durata_minute,
+        excludeId
     );
 
     return {
@@ -202,6 +203,18 @@ const createAppointment = async (appointment) => {
 
     await validateAppointmentRelations(appointment);
 
+    const availability = await checkEmployeeAvailability(
+        appointment.id_angajat,
+        appointment.id_serviciu,
+        appointment.data_ora
+    );
+
+    if (!availability.disponibil) {
+        throw InvalidDataException(
+            "Angajatul are deja o programare în acest interval"
+        );
+    }
+
     return await appointmentModel.create(appointment);
 };
 
@@ -212,6 +225,17 @@ const updateAppointment = async (id, appointment) => {
 
     await validateAppointmentRelations(appointment);
 
+    const availability = await checkEmployeeAvailability(
+        appointment.id_angajat,
+        appointment.id_serviciu,
+        appointment.data_ora,
+        id
+    );
+    if (!availability.disponibil) {
+        throw InvalidDataException(
+            "Angajatul are deja o programare în acest interval"
+        );
+    }
     const updatedAppointment = await appointmentModel.update(
         id,
         appointment
@@ -227,6 +251,7 @@ const updateAppointment = async (id, appointment) => {
 };
 
 // Actualizarea parțială a unei programări
+
 
 const patchAppointment = async (id, appointment) => {
     validateId(id, "ID-ul programării");
@@ -323,6 +348,26 @@ const patchAppointment = async (id, appointment) => {
     // Verificăm existența clientului, angajatului și serviciului
     await validateAppointmentRelations(appointmentToValidate);
 
+    // Verificăm suprapunerea dacă se modifică intervalul programării
+    if (
+        appointment.id_angajat !== undefined ||
+        appointment.id_serviciu !== undefined ||
+        appointment.data_ora !== undefined
+    ) {
+        const availability = await checkEmployeeAvailability(
+            appointmentToValidate.id_angajat,
+            appointmentToValidate.id_serviciu,
+            appointment.data_ora ?? existingAppointment.data_ora,
+            id
+        );
+
+        if (!availability.disponibil) {
+            throw InvalidDataException(
+                "Angajatul are deja o programare în acest interval"
+            );
+        }
+    }
+
     const patchedAppointment = await appointmentModel.patch(
         id,
         appointment
@@ -330,6 +375,7 @@ const patchAppointment = async (id, appointment) => {
 
     return patchedAppointment;
 };
+
 
 // Ștergerea unei programări
 const deleteAppointment = async (id) => {

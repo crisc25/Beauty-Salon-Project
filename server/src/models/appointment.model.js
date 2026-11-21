@@ -112,11 +112,14 @@ const getById = async (id) => {
 };
 
 
+
 const create = async (appointment) => {
     const result = await pool.query(
         `INSERT INTO programari
-        (id_client, id_angajat, id_serviciu, data_ora, status)
-        VALUES ($1, $2, $3, $4, $5)
+        (id_client, id_angajat, id_serviciu, data_ora, status, pret_programare)
+        SELECT $1, $2, $3, $4, $5, s.pret
+        FROM servicii s
+        WHERE s.id_serviciu = $3
         RETURNING *`,
         [
             appointment.id_client,
@@ -129,6 +132,7 @@ const create = async (appointment) => {
 
     return result.rows[0];
 };
+
 
 const update = async (id, appointment) => {
     const result = await pool.query(
@@ -206,13 +210,19 @@ const deleteById = async (id) => {
 
     return result.rows[0];
 };
-const hasOverlappingAppointment = async (id_angajat, data_ora, durata_minute) => {
+const hasOverlappingAppointment = async (
+    id_angajat,
+    data_ora,
+    durata_minute,
+    excludeId = null
+) => {
     const result = await pool.query(
         `SELECT EXISTS (
             SELECT 1
             FROM programari
             WHERE id_angajat = $1
               AND status IN ('programata', 'confirmata')
+              AND ($4::integer IS NULL OR id_programare != $4)
               AND data_ora < $2::timestamp + ($3 * INTERVAL '1 minute')
               AND data_ora + (
                   SELECT s.durata_minute * INTERVAL '1 minute'
@@ -220,7 +230,7 @@ const hasOverlappingAppointment = async (id_angajat, data_ora, durata_minute) =>
                   WHERE s.id_serviciu = programari.id_serviciu
               ) > $2::timestamp
         ) AS is_occupied`,
-        [id_angajat, data_ora, durata_minute]
+        [id_angajat, data_ora, durata_minute, excludeId]
     );
 
     return result.rows[0].is_occupied;
@@ -231,6 +241,6 @@ module.exports = {
     getById,
     create,
     update,
-    patch,hasOverlappingAppointment,
+    patch, hasOverlappingAppointment,
     deleteById
 }
